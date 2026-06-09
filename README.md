@@ -1,52 +1,152 @@
-# QtVideoPlayer - 基于 FFmpeg 的高性能多线程播放器
+# EdgeLivePlayer
 
-本项目是一款基于 **Qt 6** 与 **FFmpeg** 开发的视频播放引擎。采用多线程异步解码架构，深度优化了音视频同步算法，支持 4K 视频稳定播放。
+`EdgeLivePlayer` 是一个基于 `Qt 6` 和 `FFmpeg` 的低延迟直播播放器工程，仓库内同时包含：
 
-## 推流测试工具
+- Qt 播放器示例程序 `edgelive_demo_qt`
+- RTSP 循环推流工具 `rtsp_loop_push`
+- 本地 RTSP 服务启动脚本 `start_rtsp_server.sh`
 
-仓库内置了 `rtsp_loop_push`，用于把本地文件循环推送成更接近真实直播行为的 RTSP/RTMP 输入源。
+这个 README 以当前 Linux 开发环境为准，整理了编译、启动服务和本地推流的完整步骤。
 
-- `file playback`
-本地文件直接播放，不受墙钟限制，适合普通点播验证。
-- `realtime loop push`
-把本地文件按墙钟实时速率循环推送，默认强制实时节流，避免文件源无限供给导致播放器异常快放。
-- `simulated-network push`
-在实时推流基础上增加网络行为模拟，可注入启动延迟、抖动、突发停顿和限带宽，更适合验证 live 同步与抗抖动逻辑。
+## 项目目录
+
+常用文件和目录：
+
+- `CMakeLists.txt`：项目入口构建文件
+- `app/qt`：Qt 播放器示例
+- `core`：播放核心逻辑
+- `tools/rtsp_loop_push.cpp`：循环推流工具源码
+- `start_rtsp_server.sh`：启动本地 RTSP 服务
+- `mediamtx` / `mediamtx.yml`：本地 RTSP 服务程序与配置
+- `test.mp4`：本地测试视频
+
+## 环境要求
+
+编译前请确认系统已安装：
+
+- `cmake` 3.16 或更高版本
+- `g++`，支持 `C++17`
+- `Qt 6`：`Widgets`、`Multimedia`、`OpenGLWidgets`
+- `FFmpeg` 开发库，目录位于 `3rdparty/ffmpeg`
+
+`FFmpeg` 目录结构需要类似下面这样：
+
+```text
+3rdparty/ffmpeg/
+├── include/
+├── lib/
+└── bin/      # Windows 场景常见；Linux 不强制要求
+```
+
+## 编译
+
+在项目根目录执行：
+
+```bash
+cd /home/vboxuser/桌面/projects/demo
+cmake -S . -B build_codex
+cmake --build build_codex -j
+```
+
+编译完成后，常用产物包括：
+
+- `./build_codex/rtsp_loop_push`
+- `./build_codex/app/qt/edgelive_demo_qt`
+
+如果你已经生成过 `build_codex`，也可以直接重新编译：
+
+```bash
+cd /home/vboxuser/桌面/projects/demo
+cmake --build build_codex -j
+```
+
+## 启动本地 RTSP 服务
+
+在项目根目录启动：
+
+```bash
+cd /home/vboxuser/桌面/projects/demo && ./start_rtsp_server.sh
+```
+
+这个脚本会启动仓库内自带的 `mediamtx`，并读取 `mediamtx.yml` 配置。
+
+默认情况下，你可以向本机地址推流：
+
+```text
+rtsp://127.0.0.1:5540/live
+```
+
+## 推流命令
+
+你当前使用的推流命令如下：
+
+```bash
+./build_codex/rtsp_loop_push /home/vboxuser/桌面/projects/demo/test.mp4 rtsp://127.0.0.1:5540/live --mode realtime --copy
+```
+
+如果希望从项目根目录完整执行，可以直接用：
+
+```bash
+cd /home/vboxuser/桌面/projects/demo && ./build_codex/rtsp_loop_push /home/vboxuser/桌面/projects/demo/test.mp4 rtsp://127.0.0.1:5540/live --mode realtime --copy
+```
+
+参数说明：
+
+- `test.mp4`：本地输入视频
+- `rtsp://127.0.0.1:5540/live`：推送目标地址
+- `--mode realtime`：按实时速率推流，模拟直播节奏
+- `--copy`：尽量直接复用编码流，减少转码开销
+
+## 推荐测试流程
+
+建议按下面顺序测试：
+
+1. 编译项目
+2. 启动本地 RTSP 服务
+3. 执行 `rtsp_loop_push` 推流
+4. 启动播放器并播放 `rtsp://127.0.0.1:5540/live`
 
 示例：
 
 ```bash
-./rtsp_loop_push demo.mp4 rtsp://127.0.0.1:8554/live/test --copy
-./rtsp_loop_push demo.mp4 rtsp://127.0.0.1:8554/live/test --mode simulated-network --jitter-ms 50 --burst-ms 150 --stall-every-ms 5000 --stall-duration-ms 300
+cd /home/vboxuser/桌面/projects/demo
+cmake --build build_codex -j
+./start_rtsp_server.sh
 ```
 
-说明：
+新开一个终端执行：
 
-- `--mode realtime` 为默认模式，会强制按实时速率推流。
-- `--mode simulated-network` 会在本地代理层注入网络时序扰动，但不会修改媒体时间戳。
-- `--re` 保留为兼容参数；新版本即使不传，也会默认启用实时节流。
-- 若要复现真实直播问题，不要使用裸文件直推或绕过该工具直接把文件当无限数据源灌入播放器。
+```bash
+cd /home/vboxuser/桌面/projects/demo && ./build_codex/rtsp_loop_push /home/vboxuser/桌面/projects/demo/test.mp4 rtsp://127.0.0.1:5540/live --mode realtime --copy
+```
 
-## 🛠 开发环境与依赖 (重要)
+如果需要启动 Qt 播放器：
 
-由于 FFmpeg 开发库文件较大，本仓库未包含其二进制文件。在尝试编译运行前，**请务必按照以下步骤配置环境**：
+```bash
+cd /home/vboxuser/桌面/projects/demo && ./build_codex/app/qt/edgelive_demo_qt
+```
 
-### 1. 环境要求
-- **操作系统**：Windows (10/11)
-- **编译器**：MinGW 64-bit (建议与 Qt 版本配套)
-- **Qt 版本**：Qt 6.2 或更高版本
-- **FFmpeg 版本**：FFmpeg 6.x (Shared 或 Dev 版本)
+然后在播放器中输入：
 
-### 2. FFmpeg 目录配置
-请前往 [FFmpeg 官网](https://ffmpeg.org/download.html) 或 [gyan.dev](https://www.gyan.dev/ffmpeg/builds/) 下载对应的 **Shared** 开发包，并解压至项目根目录下的 `3rdparty/ffmpeg` 文件夹中。
-
-**必须确保目录结构如下所示**：
 ```text
-videoplayer/
-├── 3rdparty/
-│   └── ffmpeg/
-│       ├── bin/      # 存放 .dll 文件
-│       ├── include/  # 存放头文件 (.h)
-│       └── lib/      # 存放库文件 (.lib 或 .a)
-├── src/              # 源代码
-└── CMakeLists.txt
+rtsp://127.0.0.1:5540/live
+```
+
+## GitHub 上传前建议
+
+推到 GitHub 之前，建议先确认这些内容没有被误提交：
+
+- `build/`
+- `build-linux/`
+- `build_codex/`
+- `build_linux/`
+- 大体积测试文件
+- 本地 IDE 配置目录
+
+你当前仓库已经有 `.gitignore`，提交前再执行一次：
+
+```bash
+git status
+```
+
+确认没有不想上传的构建产物后，再执行提交和推送。
