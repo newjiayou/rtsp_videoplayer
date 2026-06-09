@@ -1,0 +1,11 @@
+Change Dir: 'C:/Users/86139/Desktop/demo/build'
+
+Run Build Command(s): C:/Qt/Tools/Ninja/ninja.exe -v edgelive_core
+[1/3] C:\Qt\Tools\mingw1310_64\bin\g++.exe  -IC:/Users/86139/Desktop/demo -IC:/Users/86139/Desktop/demo/3rdparty/ffmpeg/include -g -std=gnu++17 -MD -MT core/CMakeFiles/edgelive_core.dir/log/logger.cpp.obj -MF core\CMakeFiles\edgelive_core.dir\log\logger.cpp.obj.d -o core/CMakeFiles/edgelive_core.dir/log/logger.cpp.obj -c C:/Users/86139/Desktop/demo/core/log/logger.cpp
+FAILED: core/CMakeFiles/edgelive_core.dir/log/logger.cpp.obj 
+C:\Qt\Tools\mingw1310_64\bin\g++.exe  -IC:/Users/86139/Desktop/demo -IC:/Users/86139/Desktop/demo/3rdparty/ffmpeg/include -g -std=gnu++17 -MD -MT core/CMakeFiles/edgelive_core.dir/log/logger.cpp.obj -MF core\CMakeFiles\edgelive_core.dir\log\logger.cpp.obj.d -o core/CMakeFiles/edgelive_core.dir/log/logger.cpp.obj -c C:/Users/86139/Desktop/demo/core/log/logger.cpp
+[2/3] C:\Qt\Tools\mingw1310_64\bin\g++.exe  -IC:/Users/86139/Desktop/demo -IC:/Users/86139/Desktop/demo/3rdparty/ffmpeg/include -g -std=gnu++17 -MD -MT core/CMakeFiles/edgelive_core.dir/player/player_engine.cpp.obj -MF core\CMakeFiles\edgelive_core.dir\player\player_engine.cpp.obj.d -o core/CMakeFiles/edgelive_core.dir/player/player_engine.cpp.obj -c C:/Users/86139/Desktop/demo/core/player/player_engine.cpp
+FAILED: core/CMakeFiles/edgelive_core.dir/player/player_engine.cpp.obj 
+C:\Qt\Tools\mingw1310_64\bin\g++.exe  -IC:/Users/86139/Desktop/demo -IC:/Users/86139/Desktop/demo/3rdparty/ffmpeg/include -g -std=gnu++17 -MD -MT core/CMakeFiles/edgelive_core.dir/player/player_engine.cpp.obj -MF core\CMakeFiles\edgelive_core.dir\player\player_engine.cpp.obj.d -o core/CMakeFiles/edgelive_core.dir/player/player_engine.cpp.obj -c C:/Users/86139/Desktop/demo/core/player/player_engine.cpp
+ninja: build stopped: subcommand failed.
+

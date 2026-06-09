@@ -1,0 +1,40 @@
+# --- 编译器和 IDE 生成的临时文件夹 ---
+/build*/
+/bin/
+/debug/
+/release/
+/obj/
+.vs/
+.vscode/
+.idea/
+*.user
+*.user.*
+
+# --- 编译产生的目标文件 ---
+*.o
+*.obj
+*.moc
+*.qrc_*.cpp
+*.ui_*.h
+
+# --- 真正的二进制垃圾文件 ---
+# 忽略可执行文件和动态库
+*.exe
+*.dll
+*.so
+*.dylib
+
+# --- FFmpeg 特殊处理 ---
+# 忽略 FFmpeg 的 bin 目录下的动态库 (dll)，但保留 lib 和 include
+3rdparty/ffmpeg/bin/*.dll
+
+# --- 媒体资源 ---
+test.mp4
+*.avi
+*.mkv
+*.wav
+*.mp3
+
+# --- 系统文件 ---
+.DS_Store
+Thumbs.db
